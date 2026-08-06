@@ -25,6 +25,14 @@ Rinco Pi Sakura 是一个轻量的 Pi 外观包，将柔和的深色 Sakura Maca
 
 ## 安装
 
+### 从 npm 安装（推荐）
+
+```bash
+pi install npm:rinco-pi-sakura
+```
+
+该包已发布至 [npm](https://www.npmjs.com/package/rinco-pi-sakura)。
+
 ### 从 GitHub 安装
 
 ```bash

@@ -25,6 +25,14 @@ Rinco Pi Sakura is a lightweight appearance package that combines a soft, dark S
 
 ## Installation
 
+### Install from npm (recommended)
+
+```bash
+pi install npm:rinco-pi-sakura
+```
+
+The published package is available on [npm](https://www.npmjs.com/package/rinco-pi-sakura).
+
 ### Install from GitHub
 
 ```bash
