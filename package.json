@@ -1,0 +1,52 @@
+{
+  "name": "rinco-pi-sakura",
+  "version": "1.0.0",
+  "description": "Rinco's personal Sakura Macaron theme and animated cyberdeck header for Pi.",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rinisnotarobot/rinco-pi-sakura.git"
+  },
+  "homepage": "https://github.com/Rinisnotarobot/rinco-pi-sakura#readme",
+  "bugs": {
+    "url": "https://github.com/Rinisnotarobot/rinco-pi-sakura/issues"
+  },
+  "keywords": [
+    "pi-package",
+    "pi-theme",
+    "pi-extension",
+    "tui",
+    "sakura"
+  ],
+  "files": [
+    "extensions",
+    "themes",
+    "docs",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "scripts": {
+    "test": "vitest --run",
+    "test:watch": "vitest",
+    "check": "vitest --run",
+    "pack:check": "npm pack --dry-run"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "pi": {
+    "extensions": [
+      "./extensions/header/index.ts"
+    ],
+    "themes": [
+      "./themes/sakura-macaron.json"
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.4",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.9"
+  }
+}

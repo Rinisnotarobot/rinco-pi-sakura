@@ -1,0 +1,7 @@
+This package is a personal derivative of pi-sakura-cyberdeck by beautifulrem.
+Original project: https://github.com/beautifulrem/pi-sakura-cyberdeck
+License: MIT.
+
+The package contains Rinco's Sakura Macaron theme and a modified cyberdeck
+Header for Pi. The Header adds truecolor gradients, responsive positioning,
+and a startup blink animation.
