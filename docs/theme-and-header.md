@@ -24,9 +24,9 @@ Select this theme from Pi's `/settings` menu.
 | `surface` | `#1E1826` | Cards and primary surfaces |
 | `surfaceSoft` | `#251D2D` | Soft secondary surfaces |
 | `surfaceRaised` | `#2D2438` | Selected and raised regions |
-| `text` | `#F7EEF8` | Primary text |
+| `text` | `#F7EEF8` | Primary response text |
 | `textSoft` | `#D8CADC` | Secondary text |
-| `muted` | `#A99BAE` | Muted text |
+| `muted` | `#A99BAE` | Muted metadata and model thinking text |
 | `dim` | `#716879` | Lowest-emphasis text |
 | `sakura` | `#F2A7C6` | Primary accent |
 | `sakuraIro` | `#FCC9B9` | Warm Sakura accent |
@@ -37,6 +37,8 @@ Select this theme from Pi's `/settings` menu.
 | `mint` | `#AEE5C5` | Success states and strings |
 | `butter` | `#F3D98B` | Warnings and numbers |
 | `coral` | `#FF8FA3` | Errors and removed lines |
+
+Following Pi's built-in `dark` theme, model thinking uses the muted text color while the response body uses the brighter primary text color.
 
 The theme covers Pi's:
 

@@ -33,7 +33,7 @@
     "muted": "muted",
     "dim": "dim",
     "text": "text",
-    "thinkingText": "textSoft",
+    "thinkingText": "muted",
     "selectedBg": "surfaceRaised",
     "userMessageBg": "surface",
     "userMessageText": "text",

@@ -42,4 +42,12 @@ describe("Sakura Macaron theme", () => {
     expect(theme.name).toBe("sakura-macaron");
     expect(Object.keys(theme.colors)).toEqual(expect.arrayContaining(requiredColors));
   });
+
+  it("renders thinking as muted text and responses as primary text", async () => {
+    const theme = JSON.parse(
+      await readFile(resolve(root, manifest.pi.themes[0]), "utf8"),
+    );
+
+    expect([theme.colors.thinkingText, theme.colors.text]).toEqual(["muted", "text"]);
+  });
 });
