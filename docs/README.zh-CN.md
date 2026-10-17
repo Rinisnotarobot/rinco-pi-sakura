@@ -17,10 +17,10 @@ Rinco Pi Sakura 是一个轻量的 Pi 外观包，将柔和的深色 Sakura Maca
 ## 功能
 
 - **完整主题**：覆盖消息、Markdown、工具、Diff、语法高亮、Thinking 等级和导出页面。
-- **动态 Header**：使用 Sakura → Sky 的 24-bit RGB 渐变渲染 Unicode 图案。
+- **动态 Header**：使用 Sakura → Sky 的逐字素渐变渲染 Unicode 图案。
 - **启动动画**：会话启动时播放一次眨眼动画，随后保持静态显示。
-- **响应式布局**：根据终端宽度裁剪、居中，并按可用高度调整顶部留白。
-- **安全降级**：Headless、JSON 和 Print 等无 UI 模式下不会安装 Header。
+- **响应式布局**：按终端单元格宽度裁剪，并按可用高度调整顶部留白。
+- **安全降级**：仅在 TUI 模式下安装 Header；终端不支持 Truecolor 时回退到 256 色。
 - **可独立组合**：主题与 Header 可分别使用，也可搭配不占用 Header 区域的其他扩展。
 
 ## 安装
@@ -87,7 +87,7 @@ Header 会在 TUI 会话启动时自动启用，无需额外配置。
 - 在 `themes/sakura-macaron.json` 的 `vars` 中调整主题基础色。
 - 在 `extensions/header/index.ts` 中修改 `ANIME_ART`、标题文字和 RGB 渐变。
 
-修改主题时请保留 Pi Theme Schema 要求的颜色键；修改图案后建议同时在窄终端和宽终端中验证裁剪效果。完整说明见[主题与 Header 文档](theme-and-header.md)。
+修改主题时请保留 Pi Theme Schema 要求的颜色键；Pi 会拒绝未知的顶层字段和颜色键，可复用的颜色请放到 `vars` 中。修改图案后建议同时在窄终端和宽终端中验证裁剪效果。完整说明见[主题与 Header 文档](theme-and-header.md)。
 
 ## 开发
 
@@ -111,7 +111,8 @@ npm install
 | --- | --- |
 | `npm test` | 使用 Vitest 运行一次完整测试套件。 |
 | `npm run test:watch` | 以监听模式运行 Vitest，并在文件变化后重新测试。 |
-| `npm run check` | 运行项目验证测试；当前等同于一次完整 Vitest 测试。 |
+| `npm run typecheck` | 使用 `tsc --noEmit` 对扩展和测试做类型检查。 |
+| `npm run check` | 先做类型检查，再运行完整 Vitest 测试。 |
 | `npm run pack:check` | 使用 `npm pack --dry-run` 检查发布包内容，不生成正式发布。 |
 
 <!-- AUTO-GENERATED: package-scripts:end -->
@@ -128,7 +129,13 @@ npm test
 npm run test:watch
 ```
 
-验证测试与发布内容：
+类型检查：
+
+```bash
+npm run typecheck
+```
+
+验证类型、测试与发布内容：
 
 ```bash
 npm run check
@@ -147,7 +154,7 @@ npm run pack:check
 
 ### 颜色显示异常
 
-确认终端已启用 Truecolor。Header 使用 `38;2;r;g;b` ANSI 序列，主题也依赖 24-bit 色彩支持。
+确认终端已启用 Truecolor。Header 会向 Pi 查询终端色彩模式：Truecolor 终端输出 `38;2;r;g;b`，否则退回到最接近的 256 色索引。主题同样以 24-bit 色彩支持为最佳。
 
 ### Unicode 图案错位
 

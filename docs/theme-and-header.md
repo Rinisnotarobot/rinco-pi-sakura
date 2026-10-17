@@ -14,7 +14,7 @@ Theme name:
 sakura-macaron
 ```
 
-Select this theme from Pi's `/settings` menu.
+Select this theme from Pi's `/settings` menu. The file declares `"appearance": "dark"` and points `$schema` at `https://pi.dev/schemas/theme.schema.json`, the schema Pi publishes since 1.2.0.
 
 ## Palette
 
@@ -37,6 +37,9 @@ Select this theme from Pi's `/settings` menu.
 | `mint` | `#AEE5C5` | Success states and strings |
 | `butter` | `#F3D98B` | Warnings and numbers |
 | `coral` | `#FF8FA3` | Errors and removed lines |
+| `border` | `#6E5878` | Normal borders |
+| `borderMuted` | `#493C53` | Subtle borders and the scrollbar track |
+| `plum` | `#4A2333` | Transcript search highlight |
 
 Following Pi's built-in `dark` theme, model thinking uses the muted text color while the response body uses the brighter primary text color.
 
@@ -49,6 +52,7 @@ The theme covers Pi's:
 - Added, removed, and context diff lines
 - Syntax highlighting
 - Thinking levels from off through max
+- Fullscreen scrollbar and transcript search colors
 - Bash mode
 - HTML and page export backgrounds
 
@@ -64,22 +68,26 @@ extensions/header/index.ts
 
 ### Lifecycle
 
-- On `session_start`, the extension calls `ctx.ui.setHeader()` when a UI is available.
-- On `session_shutdown`, it calls `ctx.ui.setHeader(undefined)`.
-- The extension does not install the header in headless or other non-UI modes.
+- On `session_start`, the extension calls `ctx.ui.setHeader()` when `ctx.mode === "tui"` and a UI is available.
+- On `session_shutdown`, it clears the header and releases the blink timer.
+- The extension does not install the header in RPC, JSON, print, or other headless modes. RPC reports `hasUI: true`, but its `setHeader()` is a no-op, so the mode check is what actually guards the header.
 
 ### Rendering
 
 The header contains:
 
 1. Nine lines of Unicode artwork.
-2. A per-character 24-bit RGB Sakura-to-Sky gradient.
+2. A per-grapheme Sakura-to-Sky gradient.
 3. A gradient divider rail.
 4. A bold `SAKURA CYBERDECK` label with a Lavender-to-Peach gradient.
-5. Width-aware clipping and horizontal centering.
+5. Cell-aware clipping and horizontal centering.
 6. Additional top spacing based on available terminal rows for approximate vertical centering.
 
 The renderer returns no content when `width <= 0`. If terminal row detection fails, it falls back to zero available rows without interrupting the session.
+
+Clipping uses `sliceByColumn()` and `visibleWidth()` from `@earendil-works/pi-tui`, so it measures terminal cells rather than code points. Wide glyphs therefore cannot push a line past the available width, and every rendered line is guaranteed to stay within the requested width.
+
+Colors are emitted through `foregroundAnsi()` with the mode Pi detected for the terminal: `38;2;r;g;b` on Truecolor terminals, and the nearest 256-color palette index otherwise. The painted rows depend only on the terminal width, so they are computed once per width and reused for every blink frame; a frame only blanks the rows it hides.
 
 ## Brand customization
 
@@ -88,7 +96,7 @@ The renderer returns no content when `width <= 0`. If terminal row detection fai
 Edit the telemetry string in `extensions/header/index.ts`:
 
 ```ts
-const telemetry = "◈  SAKURA CYBERDECK  ◈";
+const TELEMETRY = "◈  SAKURA CYBERDECK  ◈";
 ```
 
 After replacing the text, verify its appearance with the terminal's actual Unicode glyph widths.
@@ -98,10 +106,10 @@ After replacing the text, verify its appearance with the terminal's actual Unico
 The header uses four RGB values:
 
 ```ts
-const sakura = [242, 167, 198];
-const peach = [252, 201, 185];
-const lavender = [199, 184, 245];
-const sky = [159, 211, 242];
+const SAKURA: RGB = [242, 167, 198];
+const PEACH: RGB = [252, 201, 185];
+const LAVENDER: RGB = [199, 184, 245];
+const SKY: RGB = [159, 211, 242];
 ```
 
 The artwork uses Sakura to Sky, while the label uses Lavender to Peach.
@@ -113,7 +121,7 @@ Replace the `ANIME_ART` array. For reliable rendering:
 - Keep line widths similar.
 - Test clipping in narrow terminals.
 - Avoid glyphs that are missing from common terminal fonts.
-- Remember that the current clipping logic counts Unicode code points rather than terminal cells.
+- Note that `ANIME_ART` must remain a non-empty array: `ART_WIDTH` is derived from it at module load.
 
 ### Changing the theme
 
@@ -125,8 +133,18 @@ Edit `themes/sakura-macaron.json`:
 4. Run `npm run check`.
 5. Verify messages, Markdown, tools, diffs, and all thinking levels in a real Pi TUI.
 
+Theme objects are strict: Pi rejects unknown top-level fields and unknown color tokens. Define reusable colors under `vars` instead of adding new keys under `colors`.
+
+## Compatibility
+
+Built and tested against the Pi 1.3.0 theme schema and extension API:
+
+- The theme targets the schema published at `https://pi.dev/schemas/theme.schema.json`.
+- The extension imports `visibleWidth`, `sliceByColumn`, `foregroundAnsi`, `getTerminalColorMode`, and `rgbColor` from `@earendil-works/pi-tui`, which Pi provides to extensions at runtime.
+- Both packages are declared in `peerDependencies` with a `"*"` range and are not bundled; Pi also warns when a host-provided package appears in `dependencies`.
+
 ## Truecolor and font compatibility
 
-- The header emits `38;2;r;g;b` ANSI sequences and requires Truecolor support.
+- The header asks Pi for the detected color mode and emits `38;2;r;g;b` on Truecolor terminals, falling back to the nearest 256-color palette index otherwise.
 - Hex colors in the theme also depend on terminal Truecolor support.
 - The artwork does not require a Nerd Font, but the selected terminal font must contain its Unicode characters.

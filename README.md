@@ -17,10 +17,10 @@ Rinco Pi Sakura is a lightweight appearance package that combines a soft, dark S
 ## Features
 
 - **Complete theme** — Styles messages, Markdown, tools, diffs, syntax highlighting, thinking levels, and exported pages.
-- **Animated header** — Renders Unicode artwork with a per-character Sakura-to-Sky 24-bit RGB gradient.
+- **Animated header** — Renders Unicode artwork with a per-grapheme Sakura-to-Sky gradient.
 - **Startup animation** — Plays a blink sequence when a session starts, then leaves the artwork open and static.
-- **Responsive layout** — Clips and centers content by terminal width and adjusts top spacing to the available height.
-- **Safe fallback** — Skips header installation in headless, JSON, and print modes where no UI is available.
+- **Responsive layout** — Clips by terminal cell width and adjusts top spacing to the available height.
+- **Safe fallback** — Installs only in TUI mode and falls back to 256 colors when Truecolor is unavailable.
 - **Composable resources** — The theme and header can be used independently or alongside extensions that do not replace the header region.
 
 ## Installation
@@ -112,7 +112,8 @@ npm install
 | --- | --- |
 | `npm test` | Run the complete Vitest suite once. |
 | `npm run test:watch` | Run Vitest in watch mode and retest when files change. |
-| `npm run check` | Run project verification tests; currently equivalent to a full Vitest run. |
+| `npm run typecheck` | Type-check the extension and tests with `tsc --noEmit`. |
+| `npm run check` | Run the typecheck and then the full Vitest suite. |
 | `npm run pack:check` | Inspect the publishable package with `npm pack --dry-run` without publishing it. |
 
 <!-- AUTO-GENERATED: package-scripts:end -->
@@ -129,7 +130,13 @@ Watch for changes:
 npm run test:watch
 ```
 
-Verify tests and package contents:
+Type-check the extension and tests:
+
+```bash
+npm run typecheck
+```
+
+Verify types, tests, and package contents:
 
 ```bash
 npm run check
@@ -148,7 +155,7 @@ Vitest covers the extension lifecycle, header output, package resource paths, an
 
 ### Colors look incorrect
 
-Make sure your terminal supports Truecolor. The header emits `38;2;r;g;b` ANSI sequences, and the theme also depends on 24-bit color support.
+Make sure your terminal supports Truecolor. The header asks Pi for the detected color mode and emits `38;2;r;g;b` on Truecolor terminals, falling back to the nearest 256-color palette index otherwise. The theme also looks best with 24-bit color support.
 
 ### The Unicode artwork is misaligned
 

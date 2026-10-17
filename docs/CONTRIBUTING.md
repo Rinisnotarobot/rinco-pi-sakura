@@ -29,7 +29,8 @@ Pi loads the TypeScript extension directly, so this project has no separate buil
 | --- | --- |
 | `npm test` | Run the complete Vitest suite once. |
 | `npm run test:watch` | Run Vitest in watch mode and retest when files change. |
-| `npm run check` | Run project verification tests; currently equivalent to a full Vitest run. |
+| `npm run typecheck` | Type-check the extension and tests with `tsc --noEmit`. |
+| `npm run check` | Run the typecheck and then the full Vitest suite. |
 | `npm run pack:check` | Inspect the publishable package with `npm pack --dry-run` without publishing it. |
 
 <!-- AUTO-GENERATED: package-scripts:end -->
@@ -45,8 +46,8 @@ npm run pack:check
 
 Tests live in `tests/`:
 
-- `header.test.ts` verifies extension registration, header rendering, and session cleanup.
-- `package.test.ts` verifies the Pi package manifest, resource paths, and required theme color keys.
+- `header.test.ts` verifies extension registration, TUI-mode gating, width clipping, the blink animation, and session cleanup.
+- `package.test.ts` verifies the Pi package manifest, peer declarations, resource paths, and the theme against the schema shipped with the installed Pi version.
 
 When adding tests:
 
