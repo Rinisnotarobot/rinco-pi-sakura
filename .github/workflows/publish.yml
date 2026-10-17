@@ -57,6 +57,9 @@ jobs:
         run: npm ci
 
       - name: Check types and tests
+        # The rendering suite includes a truecolor-terminal assertion.
+        env:
+          COLORTERM: truecolor
         run: npm run check
 
       - name: Inspect package contents
