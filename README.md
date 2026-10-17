@@ -145,6 +145,35 @@ npm run pack:check
 
 Vitest covers the extension lifecycle, header output, package resource paths, and theme palette. Pi loads the TypeScript source directly, so this project has no separate build command.
 
+## Publishing to npm
+
+The [publish workflow](.github/workflows/publish.yml) runs when a `v*` tag is pushed. It checks that the tag matches `package.json`, runs typechecks and tests, inspects the package, then publishes to npm. Stable versions use `latest`; prereleases use `next`.
+
+### One-time setup
+
+In the npm package's **Settings → Trusted publishing**, add a GitHub Actions publisher:
+
+- Organization or user: `Rinisnotarobot`
+- Repository: `rinco-pi-sakura`
+- Workflow filename: `publish.yml` (not the full path)
+- Environment: leave empty (the workflow does not use a GitHub environment)
+- Allow direct publishing with `npm publish` if this option is shown.
+
+The workflow uses OIDC, so no `NPM_TOKEN` secret is needed. Trusted publishing requires npm 11.5.1+; the workflow uses Node.js 24. For a new package that does not yet exist on npm, first publish it locally with `npm login` and `npm publish --access public`, then configure the trusted publisher. The GitHub repository must be public for automatic provenance generation. See [npm's trusted publishing documentation](https://docs.npmjs.com/trusted-publishers).
+
+### Release a new version
+
+From a clean checkout on your release branch:
+
+```bash
+npm version patch
+# Use minor/major instead, or: npm version prerelease --preid=beta
+git push origin HEAD
+git push origin "v$(node -p 'require("./package.json").version')"
+```
+
+`npm version` updates both manifests and creates the release commit and tag. Commit this workflow before tagging a release. Each npm version can only be published once; after a local first publish, bump the version before triggering Actions. Monitor **Actions → Publish to npm** for the result.
+
 ## Troubleshooting
 
 ### The header does not appear

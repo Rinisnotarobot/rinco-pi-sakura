@@ -1,0 +1,56 @@
+name: Publish to npm
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out release
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false
+
+      - name: Validate release version
+        id: release
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import { readFileSync, appendFileSync } from 'node:fs';
+          const { version } = JSON.parse(readFileSync('package.json', 'utf8'));
+          if (process.env.GITHUB_REF_NAME !== `v${version}`) {
+            throw new Error(`Release tag must be v${version}; got ${process.env.GITHUB_REF_NAME}`);
+          }
+          const tag = version.includes('-') ? 'next' : 'latest';
+          appendFileSync(process.env.GITHUB_OUTPUT, `dist-tag=${tag}\n`);
+          NODE
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check types and tests
+        run: npm run check
+
+      - name: Inspect package contents
+        run: npm run pack:check
+
+      - name: Publish with trusted publishing
+        run: npm publish --access public --tag "${{ steps.release.outputs.dist-tag }}"

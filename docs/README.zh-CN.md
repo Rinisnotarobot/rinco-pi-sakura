@@ -144,6 +144,35 @@ npm run pack:check
 
 本项目使用 Vitest 测试扩展生命周期、Header 输出、包资源路径和主题色板。Pi 运行时会直接加载 TypeScript 源码，因此没有单独的构建命令。
 
+## 发布到 npm
+
+[发布工作流](../.github/workflows/publish.yml)在推送 `v*` 标签时触发：校验标签与 `package.json` 版本一致，执行类型检查、测试和打包检查，然后发布。正式版本使用 `latest`，预发布版本使用 `next`。
+
+### 首次配置
+
+在 npm 包的 **Settings → Trusted publishing** 中添加 GitHub Actions 发布者：
+
+- Organization or user：`Rinisnotarobot`
+- Repository：`rinco-pi-sakura`
+- Workflow filename：`publish.yml`（不填完整路径）
+- Environment：留空（工作流未使用 GitHub environment）
+- 如显示权限选项，允许使用 `npm publish` 直接发布。
+
+工作流通过 OIDC 认证，无需配置 `NPM_TOKEN`。可信发布要求 npm 11.5.1+，工作流使用 Node.js 24。如果 npm 上尚不存在此包，先在本地执行 `npm login` 和 `npm publish --access public` 完成首次发布，再配置可信发布者。自动生成来源证明需要 GitHub 仓库公开。详见 [npm 可信发布文档](https://docs.npmjs.com/trusted-publishers)。
+
+### 发布新版本
+
+在发布分支的干净工作区执行：
+
+```bash
+npm version patch
+# 也可使用 minor/major，或：npm version prerelease --preid=beta
+git push origin HEAD
+git push origin "v$(node -p 'require("./package.json").version')"
+```
+
+`npm version` 会更新两个包清单，并创建版本提交与标签。打标签前请先提交此工作流。npm 的同一版本不能重复发布；如已在本地完成首次发布，触发 Actions 前需要升级版本。在 **Actions → Publish to npm** 查看执行结果。
+
 ## 常见问题
 
 ### Header 没有显示
